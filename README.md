@@ -4,10 +4,16 @@ Raspberry Pi 4D video interaction prototype. The preprocess step reads an SRT su
 
 ## Preprocess
 
+Install the Python dependencies:
+
+```bash
+uv sync
+```
+
 Generate the demo timeline:
 
 ```bash
-python -m preprocess
+uv run python -m preprocess
 ```
 
 By default, preprocess also reads `preprocess/video/demo.mp4` with OpenCV and adds LED color events sampled from the video frames.
@@ -15,31 +21,31 @@ By default, preprocess also reads `preprocess/video/demo.mp4` with OpenCV and ad
 Equivalent explicit command:
 
 ```bash
-python -m preprocess preprocess/subtitles/demo.srt -o preprocess/output/demo.timeline.json
+uv run python -m preprocess preprocess/subtitles/demo.srt -o preprocess/output/demo.timeline.json
 ```
 
 Disable video color analysis:
 
 ```bash
-python -m preprocess --no-video-color
+uv run python -m preprocess --no-video-color
 ```
 
 Preview the generated timeline without waiting or opening the video:
 
 ```bash
-python main.py preprocess/output/demo.timeline.json --preview
+uv run python main.py preprocess/output/demo.timeline.json --preview
 ```
 
 Run the timeline clock and module logs without opening the video player:
 
 ```bash
-python main.py preprocess/output/demo.timeline.json --dry-run
+uv run python main.py preprocess/output/demo.timeline.json --dry-run
 ```
 
 Open a realtime status window while running:
 
 ```bash
-python main.py preprocess/output/demo.timeline.json --dry-run --status-window
+uv run python main.py preprocess/output/demo.timeline.json --dry-run --status-window
 ```
 
 The status window clock updates continuously from the same timeline clock used to trigger effects.
@@ -47,14 +53,27 @@ The status window clock updates continuously from the same timeline clock used t
 Play the demo video and trigger effects on the same clock:
 
 ```bash
-python main.py preprocess/output/demo.timeline.json --video preprocess/video/demo.mp4
+uv run python main.py preprocess/output/demo.timeline.json --video preprocess/video/demo.mp4
 ```
 
-The video backend defaults to `auto`, which tries `ffplay`, `cvlc`, then `vlc`. To force one:
+The video backend defaults to `auto`, which first uses the uv-managed Python backend
+(`imageio-ffmpeg` + `pygame-ce`). If that backend is unavailable, it falls back to
+external players in this order: `ffplay`, `cvlc`, then `vlc`.
+
+To force the uv-managed Python video window:
 
 ```bash
-python main.py --player ffplay
+uv run python main.py --player python
 ```
+
+To force an external player:
+
+```bash
+uv run python main.py --player ffplay
+```
+
+The Python backend displays video frames from the project dependencies. Use `ffplay`
+or VLC if you need the system player's audio/device behavior.
 
 ## Timeline Format
 

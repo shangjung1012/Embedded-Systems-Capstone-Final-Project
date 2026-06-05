@@ -27,7 +27,7 @@ def main() -> int:
     )
     parser.add_argument(
         "--player",
-        choices=("auto", "ffplay", "cvlc", "vlc", "none"),
+        choices=("auto", "python", "ffplay", "cvlc", "vlc", "none"),
         default="auto",
         help="Video player backend. Use 'none' to run effects without opening video.",
     )

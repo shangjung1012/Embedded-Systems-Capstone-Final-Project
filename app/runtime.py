@@ -124,7 +124,7 @@ def _wait_for_player(
     if player.process is None:
         return
 
-    while player.process.poll() is None:
+    while player.is_running():
         status_monitor.update(_timeline_elapsed_ms(started_at, speed), current_effects)
         time.sleep(0.05)
 
