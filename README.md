@@ -16,16 +16,28 @@ Equivalent explicit command:
 python -m preprocess preprocess/subtitles/demo.srt -o preprocess/output/demo.timeline.json
 ```
 
-Preview the generated timeline:
+Preview the generated timeline without waiting or opening the video:
 
 ```bash
-python main.py preprocess/output/demo.timeline.json
+python main.py preprocess/output/demo.timeline.json --preview
 ```
 
-Run with real timing:
+Run the timeline clock and module logs without opening the video player:
 
 ```bash
-python main.py preprocess/output/demo.timeline.json --realtime
+python main.py preprocess/output/demo.timeline.json --dry-run
+```
+
+Play the demo video and trigger effects on the same clock:
+
+```bash
+python main.py preprocess/output/demo.timeline.json --video preprocess/video/demo.mp4
+```
+
+The video backend defaults to `auto`, which tries `ffplay`, `cvlc`, then `vlc`. To force one:
+
+```bash
+python main.py --player ffplay
 ```
 
 ## Timeline Effects
