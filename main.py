@@ -47,6 +47,11 @@ def main() -> int:
         default=1.0,
         help="Playback speed multiplier for the timeline clock. Example: 2.0 runs twice as fast.",
     )
+    parser.add_argument(
+        "--status-window",
+        action="store_true",
+        help="Open a small realtime window showing current module states.",
+    )
     args = parser.parse_args()
 
     runtime = TimelineRuntime(
@@ -55,6 +60,7 @@ def main() -> int:
         player=args.player,
         speed=args.speed,
         dry_run=args.dry_run,
+        status_window=args.status_window,
     )
     if args.preview:
         runtime.preview()

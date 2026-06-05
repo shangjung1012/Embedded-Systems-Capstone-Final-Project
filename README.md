@@ -10,10 +10,18 @@ Generate the demo timeline:
 python -m preprocess
 ```
 
+By default, preprocess also reads `preprocess/video/demo.mp4` with OpenCV and adds LED color events sampled from the video frames.
+
 Equivalent explicit command:
 
 ```bash
 python -m preprocess preprocess/subtitles/demo.srt -o preprocess/output/demo.timeline.json
+```
+
+Disable video color analysis:
+
+```bash
+python -m preprocess --no-video-color
 ```
 
 Preview the generated timeline without waiting or opening the video:
@@ -28,6 +36,14 @@ Run the timeline clock and module logs without opening the video player:
 python main.py preprocess/output/demo.timeline.json --dry-run
 ```
 
+Open a realtime status window while running:
+
+```bash
+python main.py preprocess/output/demo.timeline.json --dry-run --status-window
+```
+
+The status window clock updates continuously from the same timeline clock used to trigger effects.
+
 Play the demo video and trigger effects on the same clock:
 
 ```bash
@@ -40,7 +56,25 @@ The video backend defaults to `auto`, which tries `ffplay`, `cvlc`, then `vlc`. 
 python main.py --player ffplay
 ```
 
-## Timeline Effects
+## Timeline Format
+
+The preprocess output is grouped by module and only lists active time ranges:
+
+- `fan[]`
+- `mist[]`
+- `vibration[]`
+- `led[]`
+
+Example:
+
+```json
+{
+  "fan": [{ "start": "00:00:00.500", "end": "00:00:04.000", "speed": 90 }],
+  "mist": [{ "start": "00:00:14.000", "end": "00:00:18.000", "enabled": true }],
+  "vibration": [{ "start": "00:00:00.500", "end": "00:00:04.000", "intensity": 45 }],
+  "led": [{ "start": "00:00:00.500", "end": "00:00:01.000", "rgb": [78, 82, 76], "brightness": 0.32 }]
+}
+```
 
 The current preprocess rules map subtitle keywords into:
 

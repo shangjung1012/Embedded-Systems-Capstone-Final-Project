@@ -1,342 +1,470 @@
 {
-  "schema_version": 1,
-  "generated_at": "2026-06-05T06:16:46.614671+00:00",
-  "source": {
-    "type": "srt",
-    "path": "preprocess/subtitles/demo.srt"
-  },
-  "defaults": {
-    "fan": {
-      "speed": 0
+  "fan": [
+    {
+      "start": "00:00:00.500",
+      "end": "00:00:04.000",
+      "speed": 90
     },
-    "mist": {
-      "enabled": false
+    {
+      "start": "00:00:05.000",
+      "end": "00:00:08.500",
+      "speed": 90
     },
-    "vibration": {
-      "intensity": 0
+    {
+      "start": "00:00:09.000",
+      "end": "00:00:13.000",
+      "speed": 55
     },
-    "led": {
+    {
+      "start": "00:00:14.000",
+      "end": "00:00:18.000",
+      "speed": 35
+    },
+    {
+      "start": "00:00:19.000",
+      "end": "00:00:22.500",
+      "speed": 70
+    },
+    {
+      "start": "00:00:23.000",
+      "end": "00:00:27.000",
+      "speed": 85
+    },
+    {
+      "start": "00:00:28.000",
+      "end": "00:00:31.000",
+      "speed": 15
+    },
+    {
+      "start": "00:00:32.000",
+      "end": "00:00:35.500",
+      "speed": 45
+    },
+    {
+      "start": "00:00:36.000",
+      "end": "00:00:40.000",
+      "speed": 20
+    },
+    {
+      "start": "00:00:41.000",
+      "end": "00:00:45.000",
+      "speed": 90
+    }
+  ],
+  "mist": [
+    {
+      "start": "00:00:14.000",
+      "end": "00:00:18.000",
+      "enabled": true
+    },
+    {
+      "start": "00:00:19.000",
+      "end": "00:00:22.500",
+      "enabled": true
+    },
+    {
+      "start": "00:00:36.000",
+      "end": "00:00:40.000",
+      "enabled": true
+    }
+  ],
+  "vibration": [
+    {
+      "start": "00:00:00.500",
+      "end": "00:00:04.000",
+      "intensity": 45
+    },
+    {
+      "start": "00:00:05.000",
+      "end": "00:00:08.500",
+      "intensity": 45
+    },
+    {
+      "start": "00:00:19.000",
+      "end": "00:00:22.500",
+      "intensity": 35
+    },
+    {
+      "start": "00:00:32.000",
+      "end": "00:00:35.500",
+      "intensity": 100
+    },
+    {
+      "start": "00:00:41.000",
+      "end": "00:00:45.000",
+      "intensity": 45
+    }
+  ],
+  "led": [
+    {
+      "start": "00:00:00.000",
+      "end": "00:00:00.500",
       "rgb": [
         0,
         0,
         0
       ],
-      "brightness": 0.0
-    }
-  },
-  "event_count": 10,
-  "events": [
+      "brightness": 0.08
+    },
     {
-      "cue_index": 1,
-      "start_ms": 500,
-      "end_ms": 4000,
+      "start": "00:00:00.500",
+      "end": "00:00:01.000",
+      "rgb": [
+        78,
+        82,
+        76
+      ],
+      "brightness": 0.32
+    },
+    {
       "start": "00:00:00.500",
       "end": "00:00:04.000",
-      "duration_ms": 3500,
-      "text": "The engine starts and the car waits on the track. 賽車引擎低鳴。",
-      "tags": [
-        "racing"
+      "rgb": [
+        255,
+        70,
+        35
       ],
-      "effects": {
-        "fan": {
-          "speed": 90
-        },
-        "mist": {
-          "enabled": false
-        },
-        "vibration": {
-          "intensity": 45
-        },
-        "led": {
-          "rgb": [
-            255,
-            70,
-            35
-          ],
-          "brightness": 0.7
-        }
-      }
+      "brightness": 0.7
     },
     {
-      "cue_index": 2,
-      "start_ms": 5000,
-      "end_ms": 8500,
+      "start": "00:00:01.000",
+      "end": "00:00:01.500",
+      "rgb": [
+        89,
+        100,
+        98
+      ],
+      "brightness": 0.39
+    },
+    {
+      "start": "00:00:01.500",
+      "end": "00:00:02.000",
+      "rgb": [
+        111,
+        115,
+        106
+      ],
+      "brightness": 0.46
+    },
+    {
+      "start": "00:00:02.000",
+      "end": "00:00:03.000",
+      "rgb": [
+        87,
+        97,
+        92
+      ],
+      "brightness": 0.38
+    },
+    {
+      "start": "00:00:03.000",
+      "end": "00:00:05.000",
+      "rgb": [
+        111,
+        114,
+        102
+      ],
+      "brightness": 0.46
+    },
+    {
+      "start": "00:00:05.000",
+      "end": "00:00:05.500",
+      "rgb": [
+        101,
+        107,
+        101
+      ],
+      "brightness": 0.43
+    },
+    {
       "start": "00:00:05.000",
       "end": "00:00:08.500",
-      "duration_ms": 3500,
-      "text": "The racing car speeds forward, fast enough to feel the wind.",
-      "tags": [
-        "wind",
-        "racing"
+      "rgb": [
+        255,
+        70,
+        35
       ],
-      "effects": {
-        "fan": {
-          "speed": 90
-        },
-        "mist": {
-          "enabled": false
-        },
-        "vibration": {
-          "intensity": 45
-        },
-        "led": {
-          "rgb": [
-            255,
-            70,
-            35
-          ],
-          "brightness": 0.7
-        }
-      }
+      "brightness": 0.7
     },
     {
-      "cue_index": 3,
-      "start_ms": 9000,
-      "end_ms": 13000,
+      "start": "00:00:05.500",
+      "end": "00:00:07.000",
+      "rgb": [
+        79,
+        93,
+        94
+      ],
+      "brightness": 0.36
+    },
+    {
+      "start": "00:00:07.000",
+      "end": "00:00:08.000",
+      "rgb": [
+        94,
+        102,
+        98
+      ],
+      "brightness": 0.4
+    },
+    {
+      "start": "00:00:08.000",
+      "end": "00:00:09.500",
+      "rgb": [
+        132,
+        125,
+        111
+      ],
+      "brightness": 0.52
+    },
+    {
       "start": "00:00:09.000",
       "end": "00:00:13.000",
-      "duration_ms": 4000,
-      "text": "Dark clouds arrive, and a strong wind blows across the road. 強風吹過。",
-      "tags": [
-        "wind"
+      "rgb": [
+        180,
+        210,
+        230
       ],
-      "effects": {
-        "fan": {
-          "speed": 55
-        },
-        "mist": {
-          "enabled": false
-        },
-        "vibration": {
-          "intensity": 0
-        },
-        "led": {
-          "rgb": [
-            180,
-            210,
-            230
-          ],
-          "brightness": 0.35
-        }
-      }
+      "brightness": 0.35
     },
     {
-      "cue_index": 4,
-      "start_ms": 14000,
-      "end_ms": 18000,
+      "start": "00:00:09.500",
+      "end": "00:00:10.000",
+      "rgb": [
+        111,
+        117,
+        112
+      ],
+      "brightness": 0.47
+    },
+    {
+      "start": "00:00:10.000",
+      "end": "00:00:12.000",
+      "rgb": [
+        70,
+        87,
+        94
+      ],
+      "brightness": 0.34
+    },
+    {
+      "start": "00:00:12.000",
+      "end": "00:00:12.500",
+      "rgb": [
+        82,
+        103,
+        113
+      ],
+      "brightness": 0.41
+    },
+    {
+      "start": "00:00:12.500",
+      "end": "00:00:17.000",
+      "rgb": [
+        91,
+        114,
+        125
+      ],
+      "brightness": 0.46
+    },
+    {
       "start": "00:00:14.000",
       "end": "00:00:18.000",
-      "duration_ms": 4000,
-      "text": "It starts raining heavily. 下雨了，路面變得潮濕。",
-      "tags": [
-        "rain"
+      "rgb": [
+        115,
+        130,
+        140
       ],
-      "effects": {
-        "fan": {
-          "speed": 35
-        },
-        "mist": {
-          "enabled": true
-        },
-        "vibration": {
-          "intensity": 0
-        },
-        "led": {
-          "rgb": [
-            115,
-            130,
-            140
-          ],
-          "brightness": 0.45
-        }
-      }
+      "brightness": 0.45
     },
     {
-      "cue_index": 5,
-      "start_ms": 19000,
-      "end_ms": 22500,
+      "start": "00:00:17.000",
+      "end": "00:00:19.500",
+      "rgb": [
+        85,
+        102,
+        108
+      ],
+      "brightness": 0.41
+    },
+    {
       "start": "00:00:19.000",
       "end": "00:00:22.500",
-      "duration_ms": 3500,
-      "text": "Thunder and lightning hit during the storm. 暴雨伴隨雷聲。",
-      "tags": [
-        "rain",
-        "storm"
+      "rgb": [
+        75,
+        95,
+        130
       ],
-      "effects": {
-        "fan": {
-          "speed": 70
-        },
-        "mist": {
-          "enabled": true
-        },
-        "vibration": {
-          "intensity": 35
-        },
-        "led": {
-          "rgb": [
-            75,
-            95,
-            130
-          ],
-          "brightness": 0.55
-        }
-      }
+      "brightness": 0.55
     },
     {
-      "cue_index": 6,
-      "start_ms": 23000,
-      "end_ms": 27000,
+      "start": "00:00:19.500",
+      "end": "00:00:26.500",
+      "rgb": [
+        77,
+        92,
+        97
+      ],
+      "brightness": 0.36
+    },
+    {
       "start": "00:00:23.000",
       "end": "00:00:27.000",
-      "duration_ms": 4000,
-      "text": "The scene changes into a snowy road covered with ice. 雪景和冰冷空氣。",
-      "tags": [
-        "snow"
+      "rgb": [
+        130,
+        190,
+        255
       ],
-      "effects": {
-        "fan": {
-          "speed": 85
-        },
-        "mist": {
-          "enabled": false
-        },
-        "vibration": {
-          "intensity": 0
-        },
-        "led": {
-          "rgb": [
-            130,
-            190,
-            255
-          ],
-          "brightness": 0.65
-        }
-      }
+      "brightness": 0.65
     },
     {
-      "cue_index": 7,
-      "start_ms": 28000,
-      "end_ms": 31000,
+      "start": "00:00:26.500",
+      "end": "00:00:31.000",
+      "rgb": [
+        85,
+        103,
+        107
+      ],
+      "brightness": 0.42
+    },
+    {
       "start": "00:00:28.000",
       "end": "00:00:31.000",
-      "duration_ms": 3000,
-      "text": "Sunlight breaks through the clouds. 陽光照亮畫面。",
-      "tags": [
-        "sunny"
+      "rgb": [
+        255,
+        190,
+        80
       ],
-      "effects": {
-        "fan": {
-          "speed": 15
-        },
-        "mist": {
-          "enabled": false
-        },
-        "vibration": {
-          "intensity": 0
-        },
-        "led": {
-          "rgb": [
-            255,
-            190,
-            80
-          ],
-          "brightness": 0.8
-        }
-      }
+      "brightness": 0.8
     },
     {
-      "cue_index": 8,
-      "start_ms": 32000,
-      "end_ms": 35500,
+      "start": "00:00:31.000",
+      "end": "00:00:33.000",
+      "rgb": [
+        79,
+        91,
+        84
+      ],
+      "brightness": 0.36
+    },
+    {
       "start": "00:00:32.000",
       "end": "00:00:35.500",
-      "duration_ms": 3500,
-      "text": "A sudden crash shakes the car after a heavy impact. 碰撞造成強烈震動。",
-      "tags": [
-        "impact"
+      "rgb": [
+        255,
+        35,
+        20
       ],
-      "effects": {
-        "fan": {
-          "speed": 45
-        },
-        "mist": {
-          "enabled": false
-        },
-        "vibration": {
-          "intensity": 100
-        },
-        "led": {
-          "rgb": [
-            255,
-            35,
-            20
-          ],
-          "brightness": 1.0
-        }
-      }
+      "brightness": 1.0
     },
     {
-      "cue_index": 9,
-      "start_ms": 36000,
-      "end_ms": 40000,
+      "start": "00:00:33.000",
+      "end": "00:00:36.000",
+      "rgb": [
+        69,
+        79,
+        72
+      ],
+      "brightness": 0.31
+    },
+    {
+      "start": "00:00:36.000",
+      "end": "00:00:37.500",
+      "rgb": [
+        81,
+        88,
+        75
+      ],
+      "brightness": 0.33
+    },
+    {
       "start": "00:00:36.000",
       "end": "00:00:40.000",
-      "duration_ms": 4000,
-      "text": "Mist rises from the ground and fog covers the view. 霧氣逐漸擴散。",
-      "tags": [
-        "fog"
+      "rgb": [
+        170,
+        185,
+        190
       ],
-      "effects": {
-        "fan": {
-          "speed": 20
-        },
-        "mist": {
-          "enabled": true
-        },
-        "vibration": {
-          "intensity": 0
-        },
-        "led": {
-          "rgb": [
-            170,
-            185,
-            190
-          ],
-          "brightness": 0.4
-        }
-      }
+      "brightness": 0.4
     },
     {
-      "cue_index": 10,
-      "start_ms": 41000,
-      "end_ms": 45000,
+      "start": "00:00:37.500",
+      "end": "00:00:38.000",
+      "rgb": [
+        86,
+        95,
+        86
+      ],
+      "brightness": 0.38
+    },
+    {
+      "start": "00:00:38.000",
+      "end": "00:00:40.000",
+      "rgb": [
+        95,
+        104,
+        99
+      ],
+      "brightness": 0.42
+    },
+    {
+      "start": "00:00:40.000",
+      "end": "00:00:42.500",
+      "rgb": [
+        79,
+        92,
+        84
+      ],
+      "brightness": 0.35
+    },
+    {
       "start": "00:00:41.000",
       "end": "00:00:45.000",
-      "duration_ms": 4000,
-      "text": "The car speeds through the final straight with the engine roaring.",
-      "tags": [
-        "racing"
+      "rgb": [
+        255,
+        70,
+        35
       ],
-      "effects": {
-        "fan": {
-          "speed": 90
-        },
-        "mist": {
-          "enabled": false
-        },
-        "vibration": {
-          "intensity": 45
-        },
-        "led": {
-          "rgb": [
-            255,
-            70,
-            35
-          ],
-          "brightness": 0.7
-        }
-      }
+      "brightness": 0.7
+    },
+    {
+      "start": "00:00:42.500",
+      "end": "00:00:43.000",
+      "rgb": [
+        120,
+        135,
+        126
+      ],
+      "brightness": 0.53
+    },
+    {
+      "start": "00:00:43.000",
+      "end": "00:00:46.000",
+      "rgb": [
+        76,
+        90,
+        83
+      ],
+      "brightness": 0.35
+    },
+    {
+      "start": "00:00:46.000",
+      "end": "00:00:47.500",
+      "rgb": [
+        95,
+        106,
+        97
+      ],
+      "brightness": 0.41
+    },
+    {
+      "start": "00:00:47.500",
+      "end": "00:00:48.757",
+      "rgb": [
+        99,
+        114,
+        110
+      ],
+      "brightness": 0.44
     }
   ]
 }
