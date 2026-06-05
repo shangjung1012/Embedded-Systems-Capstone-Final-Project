@@ -1,0 +1,11 @@
+[project]
+name = "embedded-systems-capstone-final-project"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.scripts]
+preprocess-timeline = "preprocess.cli:main"
+run-timeline = "main:main"

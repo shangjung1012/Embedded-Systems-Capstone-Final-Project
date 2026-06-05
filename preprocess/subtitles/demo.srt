@@ -1,0 +1,43 @@
+1
+00:00:00,500 --> 00:00:04,000
+The engine starts and the car waits on the track. 賽車引擎低鳴。
+
+2
+00:00:05,000 --> 00:00:08,500
+The racing car speeds forward, fast enough to feel the wind.
+
+3
+00:00:09,000 --> 00:00:13,000
+Dark clouds arrive, and a strong wind blows across the road. 強風吹過。
+
+4
+00:00:14,000 --> 00:00:18,000
+It starts raining heavily. 下雨了，路面變得潮濕。
+
+5
+00:00:19,000 --> 00:00:22,500
+Thunder and lightning hit during the storm. 暴雨伴隨雷聲。
+
+6
+00:00:23,000 --> 00:00:27,000
+The scene changes into a snowy road covered with ice. 雪景和冰冷空氣。
+
+7
+00:00:28,000 --> 00:00:31,000
+Sunlight breaks through the clouds. 陽光照亮畫面。
+
+8
+00:00:32,000 --> 00:00:35,500
+A sudden crash shakes the car after a heavy impact. 碰撞造成強烈震動。
+
+9
+00:00:36,000 --> 00:00:40,000
+Mist rises from the ground and fog covers the view. 霧氣逐漸擴散。
+
+10
+00:00:41,000 --> 00:00:45,000
+The car speeds through the final straight with the engine roaring.
+
+11
+00:00:46,000 --> 00:00:48,500
+The scene calms down, and the light fades.
