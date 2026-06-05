@@ -1,17 +1,11 @@
 from __future__ import annotations
 
-try:
-    from gpiozero import OutputDevice
-except ImportError:  # Allows development on machines without gpiozero.
-    OutputDevice = None  # type: ignore[assignment]
-
-
-VIBRATION_GPIO = 17  # GPIO17 = physical pin 11
+from app.gpio import GpioPins, create_output_device
 
 
 class VibratorController:
     def __init__(self) -> None:
-        self.vibration = OutputDevice(VIBRATION_GPIO) if OutputDevice is not None else None
+        self.vibration = create_output_device(GpioPins.VIBRATION)
 
     def apply(self, config: dict[str, object]) -> None:
         intensity = int(config.get("intensity", 0))
@@ -23,13 +17,11 @@ class VibratorController:
 
     def off(self) -> None:
         print("[vibrator] OFF")
-        if self.vibration is not None:
-            self.vibration.off()
+        self.vibration.off()
 
     def _on(self, intensity: int) -> None:
         print(f"[vibrator] ON intensity={intensity}")
-        if self.vibration is not None:
-            self.vibration.on()
+        self.vibration.on()
 
 
 def _clamp(value: int, minimum: int = 0, maximum: int = 100) -> int:

@@ -56,3 +56,5 @@ The JSON file is intentionally hardware-neutral so GPIO code can be added later 
 - Vibration module: GPIO17, physical pin 11
 - Fan INA: GPIO22, physical pin 15
 - Fan INB: GPIO27, physical pin 13
+
+GPIO definitions are centralized in `app/gpio.py`.
