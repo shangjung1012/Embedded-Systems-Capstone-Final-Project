@@ -50,3 +50,9 @@ The current preprocess rules map subtitle keywords into:
 - `led.rgb` and `led.brightness`
 
 The JSON file is intentionally hardware-neutral so GPIO code can be added later without changing the preprocess pipeline.
+
+## GPIO Pins
+
+- Vibration module: GPIO17, physical pin 11
+- Fan INA: GPIO22, physical pin 15
+- Fan INB: GPIO27, physical pin 13
