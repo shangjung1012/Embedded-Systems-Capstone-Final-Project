@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
+from app.gpio import configure_gpio_pins
 from app.runtime import TimelineRuntime
 
 
@@ -52,7 +53,28 @@ def main() -> int:
         action="store_true",
         help="Open a small realtime window showing current module states.",
     )
+    parser.add_argument(
+        "--vibration-pin",
+        type=int,
+        help="BCM GPIO pin for the vibration module. Defaults to VIBRATION_PIN or 17.",
+    )
+    parser.add_argument(
+        "--fan-ina-pin",
+        type=int,
+        help="BCM GPIO pin for the fan INA input. Defaults to FAN_INA_PIN or 22.",
+    )
+    parser.add_argument(
+        "--fan-inb-pin",
+        type=int,
+        help="BCM GPIO pin for the fan INB input. Defaults to FAN_INB_PIN or 27.",
+    )
     args = parser.parse_args()
+
+    configure_gpio_pins(
+        vibration_pin=args.vibration_pin,
+        fan_ina_pin=args.fan_ina_pin,
+        fan_inb_pin=args.fan_inb_pin,
+    )
 
     runtime = TimelineRuntime(
         args.timeline,

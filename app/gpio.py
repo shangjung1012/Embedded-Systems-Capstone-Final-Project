@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import os
 import sys
 from typing import Protocol
 
@@ -25,10 +26,34 @@ class GpioPin:
     physical_pin: int
 
 
+def _env_int(name: str, default: int) -> int:
+    value = os.getenv(name)
+    if value is None or value == "":
+        return default
+    try:
+        return int(value)
+    except ValueError as error:
+        raise ValueError(f"{name} must be an integer GPIO BCM pin number") from error
+
+
 class GpioPins:
-    VIBRATION = GpioPin("vibration", gpio=17, physical_pin=11)
-    FAN_INA = GpioPin("fan_ina", gpio=22, physical_pin=15)
-    FAN_INB = GpioPin("fan_inb", gpio=27, physical_pin=13)
+    VIBRATION = GpioPin("vibration", gpio=_env_int("VIBRATION_PIN", 17), physical_pin=11)
+    FAN_INA = GpioPin("fan_ina", gpio=_env_int("FAN_INA_PIN", 22), physical_pin=15)
+    FAN_INB = GpioPin("fan_inb", gpio=_env_int("FAN_INB_PIN", 27), physical_pin=13)
+
+
+def configure_gpio_pins(
+    *,
+    vibration_pin: int | None = None,
+    fan_ina_pin: int | None = None,
+    fan_inb_pin: int | None = None,
+) -> None:
+    if vibration_pin is not None:
+        GpioPins.VIBRATION = GpioPin("vibration", gpio=vibration_pin, physical_pin=11)
+    if fan_ina_pin is not None:
+        GpioPins.FAN_INA = GpioPin("fan_ina", gpio=fan_ina_pin, physical_pin=15)
+    if fan_inb_pin is not None:
+        GpioPins.FAN_INB = GpioPin("fan_inb", gpio=fan_inb_pin, physical_pin=13)
 
 
 class NullOutputDevice:
