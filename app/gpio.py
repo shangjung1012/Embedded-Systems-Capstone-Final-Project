@@ -40,6 +40,7 @@ class GpioPins:
     VIBRATION = GpioPin("vibration", gpio=_env_int("VIBRATION_PIN", 17), physical_pin=11)
     FAN_INA = GpioPin("fan_ina", gpio=_env_int("FAN_INA_PIN", 22), physical_pin=15)
     FAN_INB = GpioPin("fan_inb", gpio=_env_int("FAN_INB_PIN", 27), physical_pin=13)
+    MIST = GpioPin("mist", gpio=_env_int("MIST_PIN", 23), physical_pin=16)
 
 
 def configure_gpio_pins(
@@ -47,6 +48,7 @@ def configure_gpio_pins(
     vibration_pin: int | None = None,
     fan_ina_pin: int | None = None,
     fan_inb_pin: int | None = None,
+    mist_pin: int | None = None,
 ) -> None:
     if vibration_pin is not None:
         GpioPins.VIBRATION = GpioPin("vibration", gpio=vibration_pin, physical_pin=11)
@@ -54,6 +56,8 @@ def configure_gpio_pins(
         GpioPins.FAN_INA = GpioPin("fan_ina", gpio=fan_ina_pin, physical_pin=15)
     if fan_inb_pin is not None:
         GpioPins.FAN_INB = GpioPin("fan_inb", gpio=fan_inb_pin, physical_pin=13)
+    if mist_pin is not None:
+        GpioPins.MIST = GpioPin("mist", gpio=mist_pin, physical_pin=16)
 
 
 class NullOutputDevice:
@@ -70,12 +74,12 @@ class NullOutputDevice:
 _warned_pins: set[str] = set()
 
 
-def create_output_device(pin: GpioPin) -> OutputDeviceLike:
+def create_output_device(pin: GpioPin, *, active_high: bool = True) -> OutputDeviceLike:
     if GpioZeroOutputDevice is None:
         return NullOutputDevice(pin)
 
     try:
-        return GpioZeroOutputDevice(pin.gpio)
+        return GpioZeroOutputDevice(pin.gpio, active_high=active_high)
     except Exception as error:
         if pin.name not in _warned_pins:
             print(

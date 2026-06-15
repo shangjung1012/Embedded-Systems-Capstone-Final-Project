@@ -68,12 +68,18 @@ def main() -> int:
         type=int,
         help="BCM GPIO pin for the fan INB input. Defaults to FAN_INB_PIN or 27.",
     )
+    parser.add_argument(
+        "--mist-pin",
+        type=int,
+        help="BCM GPIO pin for the mist module. Defaults to MIST_PIN or 23.",
+    )
     args = parser.parse_args()
 
     configure_gpio_pins(
         vibration_pin=args.vibration_pin,
         fan_ina_pin=args.fan_ina_pin,
         fan_inb_pin=args.fan_inb_pin,
+        mist_pin=args.mist_pin,
     )
 
     runtime = TimelineRuntime(
