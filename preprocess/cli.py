@@ -7,6 +7,11 @@ from pathlib import Path
 from preprocess.srt import parse_srt
 from preprocess.timeline import build_timeline
 from preprocess.video import build_video_color_events
+from preprocess.gemini_video import (
+    DEFAULT_GEMINI_CREDENTIALS,
+    DEFAULT_GEMINI_MODEL,
+    build_gemini_video_events,
+)
 
 
 DEFAULT_SUBTITLE = Path("preprocess/subtitles/demo.srt")
@@ -70,6 +75,61 @@ def main(argv: list[str] | None = None) -> int:
         default=2000,
         help="Maximum vibration duration per matched cue. Use 0 to keep the full cue duration.",
     )
+    parser.add_argument(
+        "--gemini-video",
+        action="store_true",
+        help="Enable Gemini frame analysis for mist, vibration, and fan events.",
+    )
+    parser.add_argument(
+        "--gemini-credentials",
+        type=Path,
+        default=DEFAULT_GEMINI_CREDENTIALS,
+        help=f"Service account JSON for Vertex AI Gemini. Defaults to {DEFAULT_GEMINI_CREDENTIALS}.",
+    )
+    parser.add_argument(
+        "--gemini-project",
+        help="Google Cloud project for Vertex AI. Defaults to project_id in the service account JSON.",
+    )
+    parser.add_argument(
+        "--gemini-location",
+        default="us-central1",
+        help="Vertex AI location for Gemini. Defaults to us-central1.",
+    )
+    parser.add_argument(
+        "--gemini-model",
+        default=DEFAULT_GEMINI_MODEL,
+        help=f"Gemini model name. Defaults to {DEFAULT_GEMINI_MODEL}.",
+    )
+    parser.add_argument(
+        "--gemini-interval-ms",
+        type=int,
+        default=3000,
+        help="Frame sampling interval for Gemini video analysis.",
+    )
+    parser.add_argument(
+        "--gemini-event-duration-ms",
+        type=int,
+        default=0,
+        help="Deprecated. Gemini events now follow sampled frame spans.",
+    )
+    parser.add_argument(
+        "--gemini-hold-frames",
+        type=int,
+        default=1,
+        help="Keep Gemini effects alive across this many missed frame detections.",
+    )
+    parser.add_argument(
+        "--gemini-request-delay-ms",
+        type=int,
+        default=0,
+        help="Delay between Gemini API requests to reduce rate-limit errors.",
+    )
+    parser.add_argument(
+        "--gemini-min-confidence",
+        type=float,
+        default=0.55,
+        help="Minimum Gemini confidence required to add an event.",
+    )
     args = parser.parse_args(argv)
 
     subtitle_path = args.subtitle
@@ -83,11 +143,24 @@ def main(argv: list[str] | None = None) -> int:
             interval_ms=args.color_interval_ms,
             color_change_threshold=args.color_threshold,
         )
+    gemini_video_events = []
+    if args.gemini_video:
+        gemini_video_events = build_gemini_video_events(
+            args.video,
+            credentials_path=args.gemini_credentials,
+            project=args.gemini_project,
+            location=args.gemini_location,
+            model=args.gemini_model,
+            interval_ms=args.gemini_interval_ms,
+            min_confidence=args.gemini_min_confidence,
+            hold_frames=args.gemini_hold_frames,
+            request_delay_ms=args.gemini_request_delay_ms,
+        )
     timeline = build_timeline(
         cues,
         subtitle_path,
         include_neutral=args.include_neutral,
-        extra_events=video_color_events,
+        extra_events=[*video_color_events, *gemini_video_events],
         fan_duration_ms=_duration_limit(args.fan_duration_ms),
         vibration_duration_ms=_duration_limit(args.vibration_duration_ms),
     )

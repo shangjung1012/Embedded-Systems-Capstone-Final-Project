@@ -43,6 +43,42 @@ Disable video color analysis:
 uv run python -m preprocess --no-video-color
 ```
 
+Enable Gemini frame analysis:
+
+```bash
+uv run python -m preprocess --gemini-video
+```
+
+By default this looks for a Vertex AI service account at
+`preprocess/service_account.json`, samples one frame every 3 seconds, and writes
+the detected mist, vibration, fan, and LED events into the same timeline JSON.
+You can tune it with:
+
+```bash
+uv run python -m preprocess --gemini-video --gemini-interval-ms 5000 --gemini-min-confidence 0.65
+```
+
+Gemini spray, shake, and speed detections are merged across sampled frames, so a
+rainy, vibrating, or fast scene stays active until a later sample shows it has
+ended. By default, one missed frame is tolerated; tune that with:
+
+```bash
+uv run python -m preprocess --gemini-video --gemini-hold-frames 2
+```
+
+If you need dense frame sampling but want slower API calls, add a request delay:
+
+```bash
+uv run python -m preprocess --gemini-video --gemini-interval-ms 1000 --gemini-request-delay-ms 3000
+```
+
+Gemini visual tags map to hardware as:
+
+- spray, splash, smoke, rain, or anything ejecting outward -> `mist`
+- jumping, bouncing, collision, or screen shake -> `vibration`
+- clear speed or rushing motion -> `fan`
+- none -> no event
+
 Preview the generated timeline without waiting or opening the video:
 
 ```bash

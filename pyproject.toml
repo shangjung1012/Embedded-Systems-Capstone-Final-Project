@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "gpiozero>=2.0.1",
+    "google-genai>=1.0.0",
     "imageio-ffmpeg>=0.6.0",
     "opencv-python-headless>=4.10.0.84",
     "pygame-ce>=2.5.7",

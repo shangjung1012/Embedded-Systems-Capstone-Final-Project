@@ -74,10 +74,15 @@ def _build_module_schedules(
                 continue
 
             start_ms = int(event["start_ms"])
+            event_duration_limits = event.get("duration_limits", {})
+            if isinstance(event_duration_limits, dict) and module in event_duration_limits:
+                duration_limit_ms = event_duration_limits[module]
+            else:
+                duration_limit_ms = module_duration_limits.get(module)
             end_ms = _limited_end_ms(
                 start_ms,
                 int(event["end_ms"]),
-                module_duration_limits.get(module),
+                duration_limit_ms,
             )
             modules[module].append({
                 "start": format_timecode(start_ms),
