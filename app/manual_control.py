@@ -121,7 +121,7 @@ class ManualControlSession:
 
                 self.effects = result.effects
                 if result.should_apply:
-                    self.controller.apply(self.effects)
+                    self.controller.apply(self.effects, force=True)
                 if result.message:
                     self._print(result.message)
                 if result.should_exit:
