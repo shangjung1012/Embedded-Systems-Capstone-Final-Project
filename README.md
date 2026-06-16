@@ -17,11 +17,24 @@ uv run python -m preprocess
 ```
 
 By default, preprocess also reads `preprocess/video/demo.mp4` with OpenCV and adds LED color events sampled from the video frames.
+Because the current GPIO fan and vibration outputs are simple on/off pins, generated fan and vibration events are capped at 2 seconds by default.
 
 Equivalent explicit command:
 
 ```bash
 uv run python -m preprocess preprocess/subtitles/demo.srt -o preprocess/output/demo.timeline.json
+```
+
+Change those short on/off durations:
+
+```bash
+uv run python -m preprocess --fan-duration-ms 3000 --vibration-duration-ms 1000
+```
+
+Use `0` to keep the full matched subtitle cue duration:
+
+```bash
+uv run python -m preprocess --fan-duration-ms 0 --vibration-duration-ms 0
 ```
 
 Disable video color analysis:
@@ -88,18 +101,18 @@ Example:
 
 ```json
 {
-  "fan": [{ "start": "00:00:00.500", "end": "00:00:04.000", "speed": 90 }],
+  "fan": [{ "start": "00:00:00.500", "end": "00:00:02.500", "enabled": true }],
   "mist": [{ "start": "00:00:14.000", "end": "00:00:18.000", "enabled": true }],
-  "vibration": [{ "start": "00:00:00.500", "end": "00:00:04.000", "intensity": 45 }],
+  "vibration": [{ "start": "00:00:00.500", "end": "00:00:02.500", "enabled": true }],
   "led": [{ "start": "00:00:00.500", "end": "00:00:01.000", "rgb": [78, 82, 76], "brightness": 0.32 }]
 }
 ```
 
 The current preprocess rules map subtitle keywords into:
 
-- `fan.speed`: 0-100
+- `fan.enabled`: true or false
 - `mist.enabled`: true or false
-- `vibration.intensity`: 0-100
+- `vibration.enabled`: true or false
 - `led.rgb` and `led.brightness`
 
 The JSON file is intentionally hardware-neutral so GPIO code can be added later without changing the preprocess pipeline.

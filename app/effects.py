@@ -11,9 +11,9 @@ from app.module.vibrator import VibratorController
 
 
 DEFAULT_EFFECTS: dict[str, Any] = {
-    "fan": {"speed": 0},
+    "fan": {"enabled": False},
     "mist": {"enabled": False},
-    "vibration": {"intensity": 0},
+    "vibration": {"enabled": False},
     "led": {"rgb": [0, 0, 0], "brightness": 0.0},
 }
 
@@ -65,9 +65,9 @@ def merge_active_effects(events: list[dict[str, Any]]) -> dict[str, Any]:
         return DEFAULT_EFFECTS
 
     merged = {
-        "fan": {"speed": 0},
+        "fan": {"enabled": False},
         "mist": {"enabled": False},
-        "vibration": {"intensity": 0},
+        "vibration": {"enabled": False},
         "led": {"rgb": [0, 0, 0], "brightness": 0.0},
     }
     video_led_events = [
@@ -81,11 +81,9 @@ def merge_active_effects(events: list[dict[str, Any]]) -> dict[str, Any]:
         fan = effects.get("fan", DEFAULT_EFFECTS["fan"])
         mist = effects.get("mist", DEFAULT_EFFECTS["mist"])
         vibration = effects.get("vibration", DEFAULT_EFFECTS["vibration"])
-        merged["fan"]["speed"] = max(merged["fan"]["speed"], int(fan["speed"]))
+        merged["fan"]["enabled"] = merged["fan"]["enabled"] or bool(fan["enabled"])
         merged["mist"]["enabled"] = merged["mist"]["enabled"] or bool(mist["enabled"])
-        merged["vibration"]["intensity"] = max(
-            merged["vibration"]["intensity"], int(vibration["intensity"])
-        )
+        merged["vibration"]["enabled"] = merged["vibration"]["enabled"] or bool(vibration["enabled"])
 
     if newest_led_event is not None:
         merged["led"] = dict(newest_led_event["effects"].get("led", DEFAULT_EFFECTS["led"]))

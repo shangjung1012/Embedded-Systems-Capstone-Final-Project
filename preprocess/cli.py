@@ -58,6 +58,18 @@ def main(argv: list[str] | None = None) -> int:
         default=10,
         help="Minimum RGB channel change required to start a new LED color event.",
     )
+    parser.add_argument(
+        "--fan-duration-ms",
+        type=int,
+        default=2000,
+        help="Maximum fan duration per matched cue. Use 0 to keep the full cue duration.",
+    )
+    parser.add_argument(
+        "--vibration-duration-ms",
+        type=int,
+        default=2000,
+        help="Maximum vibration duration per matched cue. Use 0 to keep the full cue duration.",
+    )
     args = parser.parse_args(argv)
 
     subtitle_path = args.subtitle
@@ -76,6 +88,8 @@ def main(argv: list[str] | None = None) -> int:
         subtitle_path,
         include_neutral=args.include_neutral,
         extra_events=video_color_events,
+        fan_duration_ms=_duration_limit(args.fan_duration_ms),
+        vibration_duration_ms=_duration_limit(args.vibration_duration_ms),
     )
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -84,3 +98,7 @@ def main(argv: list[str] | None = None) -> int:
     entry_count = sum(len(schedule) for schedule in timeline.values())
     print(f"Wrote {entry_count} module schedule entries to {output_path}")
     return 0
+
+
+def _duration_limit(value: int) -> int | None:
+    return value if value > 0 else None

@@ -187,11 +187,11 @@ def _parse_timecode(value: str) -> int:
 
 def _config_from_schedule_item(module: str, item: dict[str, Any]) -> dict[str, Any]:
     if module == "fan":
-        return {"speed": item["speed"]}
+        return {"enabled": item["enabled"]}
     if module == "mist":
         return {"enabled": item["enabled"]}
     if module == "vibration":
-        return {"intensity": item["intensity"]}
+        return {"enabled": item["enabled"]}
     if module == "led":
         return {"rgb": item["rgb"], "brightness": item["brightness"]}
     return {}
@@ -209,16 +209,16 @@ def _format_event(event: dict[str, Any]) -> str:
         )
 
     effects = event["effects"]
-    fan = effects.get("fan", {"speed": 0})
+    fan = effects.get("fan", {"enabled": False})
     mist = effects.get("mist", {"enabled": False})
-    vibration = effects.get("vibration", {"intensity": 0})
+    vibration = effects.get("vibration", {"enabled": False})
     led = effects.get("led", {"rgb": [0, 0, 0], "brightness": 0.0})
     return (
         f"{event['start']} -> {event['end']} "
         f"tags={','.join(event['tags']) or 'neutral'} "
-        f"fan={fan['speed']} "
+        f"fan={str(fan['enabled']).lower()} "
         f"mist={str(mist['enabled']).lower()} "
-        f"vibration={vibration['intensity']} "
+        f"vibration={str(vibration['enabled']).lower()} "
         f"led=rgb({led['rgb'][0]},{led['rgb'][1]},{led['rgb'][2]})@{led['brightness']}"
     )
 

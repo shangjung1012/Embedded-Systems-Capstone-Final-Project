@@ -34,9 +34,9 @@ class TkStatusWindow:
         self.root.resizable(False, False)
 
         self.time_var = tk.StringVar(value="time: 00:00:00.000")
-        self.fan_var = tk.StringVar(value="fan: 0")
+        self.fan_var = tk.StringVar(value="fan: off")
         self.mist_var = tk.StringVar(value="mist: off")
-        self.vibration_var = tk.StringVar(value="vibration: 0")
+        self.vibration_var = tk.StringVar(value="vibration: off")
         self.led_var = tk.StringVar(value="led: rgb(0,0,0) @ 0.00")
 
         root = self.root
@@ -69,9 +69,9 @@ class TkStatusWindow:
         red, green, blue = led["rgb"]
 
         self.time_var.set(f"time: {format_timecode(elapsed_ms)}")
-        self.fan_var.set(f"fan: speed {fan['speed']}")
+        self.fan_var.set(f"fan: {'on' if fan['enabled'] else 'off'}")
         self.mist_var.set(f"mist: {'on' if mist['enabled'] else 'off'}")
-        self.vibration_var.set(f"vibration: intensity {vibration['intensity']}")
+        self.vibration_var.set(f"vibration: {'on' if vibration['enabled'] else 'off'}")
         self.led_var.set(f"led: rgb({red},{green},{blue}) @ {led['brightness']:.2f}")
         self.led_swatch.configure(bg=f"#{red:02x}{green:02x}{blue:02x}")
         try:
@@ -104,11 +104,9 @@ def build_status_monitor(*, window: bool) -> StatusMonitor:
 def normalize_effects(effects: dict[str, Any]) -> dict[str, Any]:
     led = effects.get("led", DEFAULT_EFFECTS["led"])
     return {
-        "fan": {"speed": int(effects.get("fan", DEFAULT_EFFECTS["fan"])["speed"])},
+        "fan": {"enabled": bool(effects.get("fan", DEFAULT_EFFECTS["fan"])["enabled"])},
         "mist": {"enabled": bool(effects.get("mist", DEFAULT_EFFECTS["mist"])["enabled"])},
-        "vibration": {
-            "intensity": int(effects.get("vibration", DEFAULT_EFFECTS["vibration"])["intensity"])
-        },
+        "vibration": {"enabled": bool(effects.get("vibration", DEFAULT_EFFECTS["vibration"])["enabled"])},
         "led": {
             "rgb": [int(value) for value in led["rgb"]],
             "brightness": float(led["brightness"]),

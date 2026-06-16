@@ -16,6 +16,8 @@ def build_timeline(
     *,
     include_neutral: bool = False,
     extra_events: list[dict[str, Any]] | None = None,
+    fan_duration_ms: int | None = 2_000,
+    vibration_duration_ms: int | None = 2_000,
 ) -> dict[str, Any]:
     events: list[dict[str, Any]] = []
 
@@ -47,13 +49,22 @@ def build_timeline(
 
     events.sort(key=lambda event: (event["start_ms"], event["end_ms"], event.get("id", "")))
 
-    modules = _build_module_schedules(events)
+    module_duration_limits = {
+        "fan": fan_duration_ms,
+        "vibration": vibration_duration_ms,
+    }
+    modules = _build_module_schedules(events, module_duration_limits=module_duration_limits)
 
     return modules
 
 
-def _build_module_schedules(events: list[dict[str, Any]]) -> dict[str, list[dict[str, Any]]]:
+def _build_module_schedules(
+    events: list[dict[str, Any]],
+    *,
+    module_duration_limits: dict[str, int | None] | None = None,
+) -> dict[str, list[dict[str, Any]]]:
     modules: dict[str, list[dict[str, Any]]] = {module: [] for module in MODULE_KEYS}
+    module_duration_limits = module_duration_limits or {}
 
     for event in events:
         effects = event["effects"]
@@ -62,9 +73,15 @@ def _build_module_schedules(events: list[dict[str, Any]]) -> dict[str, list[dict
             if config is None or config == NEUTRAL_EFFECTS[module]:
                 continue
 
+            start_ms = int(event["start_ms"])
+            end_ms = _limited_end_ms(
+                start_ms,
+                int(event["end_ms"]),
+                module_duration_limits.get(module),
+            )
             modules[module].append({
-                "start": event["start"],
-                "end": event["end"],
+                "start": format_timecode(start_ms),
+                "end": format_timecode(end_ms),
                 **config,
             })
 
@@ -72,3 +89,9 @@ def _build_module_schedules(events: list[dict[str, Any]]) -> dict[str, list[dict
         schedule.sort(key=lambda item: (item["start"], item["end"]))
 
     return modules
+
+
+def _limited_end_ms(start_ms: int, end_ms: int, duration_limit_ms: int | None) -> int:
+    if duration_limit_ms is None or duration_limit_ms <= 0:
+        return end_ms
+    return min(end_ms, start_ms + duration_limit_ms)

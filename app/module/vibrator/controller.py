@@ -8,10 +8,8 @@ class VibratorController:
         self.vibration = create_output_device(GpioPins.VIBRATION)
 
     def apply(self, config: dict[str, object]) -> None:
-        intensity = int(config.get("intensity", 0))
-        intensity = _clamp(intensity)
-        if intensity > 0:
-            self._on(intensity)
+        if bool(config.get("enabled", False)):
+            self._on()
         else:
             self.off()
 
@@ -19,10 +17,6 @@ class VibratorController:
         print("[vibrator] OFF")
         self.vibration.off()
 
-    def _on(self, intensity: int) -> None:
-        print(f"[vibrator] ON intensity={intensity}")
+    def _on(self) -> None:
+        print("[vibrator] ON")
         self.vibration.on()
-
-
-def _clamp(value: int, minimum: int = 0, maximum: int = 100) -> int:
-    return max(minimum, min(maximum, value))

@@ -9,10 +9,8 @@ class FanController:
         self.inb = create_output_device(GpioPins.FAN_INB)
 
     def apply(self, config: dict[str, object]) -> None:
-        speed = int(config.get("speed", 0))
-        speed = _clamp(speed)
-        if speed > 0:
-            self._on(speed)
+        if bool(config.get("enabled", False)):
+            self._on()
         else:
             self.off()
 
@@ -21,11 +19,7 @@ class FanController:
         self.ina.off()
         self.inb.off()
 
-    def _on(self, speed: int) -> None:
-        print(f"[fan] ON speed={speed}")
+    def _on(self) -> None:
+        print("[fan] ON")
         self.ina.off()
         self.inb.on()
-
-
-def _clamp(value: int, minimum: int = 0, maximum: int = 100) -> int:
-    return max(minimum, min(maximum, value))
