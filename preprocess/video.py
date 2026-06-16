@@ -106,7 +106,17 @@ def _sample_positions(length: int, count: int, *, reverse: bool) -> list[int]:
 
 def _pixel_config(pixel: Any) -> dict[str, Any]:
     blue, green, red = (int(value) for value in pixel[:3])
-    return {"rgb": [red, green, blue], "brightness": 1.0}
+    return {"rgb": _enhance_rgb([red, green, blue]), "brightness": 1.0}
+
+
+def _enhance_rgb(rgb: list[int]) -> list[int]:
+    mean = sum(rgb) / 3
+    boosted = [_clamp(round(mean + (channel - mean) * 2.2), 0, 255) for channel in rgb]
+    max_channel = max(boosted)
+    if max_channel > 0:
+        scale = 255 / max_channel
+        boosted = [_clamp(round(channel * scale), 0, 255) for channel in boosted]
+    return boosted
 
 
 def _frame_led_color(frame: Any, cv2: Any) -> tuple[list[int], float]:
@@ -148,6 +158,10 @@ def _build_led_event(
 
 def _color_distance(left: list[int], right: list[int]) -> int:
     return max(abs(left[index] - right[index]) for index in range(3))
+
+
+def _clamp(value: int, minimum: int, maximum: int) -> int:
+    return max(minimum, min(maximum, value))
 
 
 def _zones_signature(zones: dict[str, list[dict[str, Any]]]) -> list[int]:
