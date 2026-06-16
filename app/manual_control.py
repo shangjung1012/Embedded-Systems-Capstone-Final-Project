@@ -43,7 +43,12 @@ def apply_manual_command(current_effects: dict[str, object], command_line: str) 
 
     command = parts[0]
     if command in ("quit", "exit"):
-        return ManualCommandResult(effects=effects, message="Exiting manual control.", should_exit=True)
+        return ManualCommandResult(
+            effects=initial_effects(),
+            message="Exiting manual control.",
+            should_apply=True,
+            should_exit=True,
+        )
 
     if command == "help":
         return ManualCommandResult(effects=effects, message=HELP_TEXT.rstrip())
