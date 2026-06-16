@@ -9,7 +9,7 @@ except ImportError:
     Color = None      # type: ignore[assignment]
     PixelStrip = None  # type: ignore[assignment]
 
-LED_COUNT = 53
+LED_COUNT = 120
 _LED_PIN = 18
 _LED_FREQ_HZ = 800000
 _LED_DMA = 10

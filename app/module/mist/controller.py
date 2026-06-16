@@ -37,10 +37,6 @@ class MistController:
             GPIO.output(self.pin, GPIO.LOW)  # GPIO LOW → 霧化開啟
 
     def _off(self) -> None:
-        # 改了可能會關不掉
         if self.available:
             GPIO.output(self.pin, GPIO.HIGH)
             time.sleep(0.1)
-            GPIO.output(self.pin, GPIO.LOW)
-            time.sleep(0.1)
-            GPIO.output(self.pin, GPIO.HIGH)  # GPIO HIGH → 關閉
