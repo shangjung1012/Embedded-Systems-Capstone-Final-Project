@@ -20,16 +20,18 @@ You classify one sampled video frame for a Raspberry Pi 4D video prototype.
 Choose exactly one tag:
 - spray: anything visibly spraying, bursting, splashing, steaming, smoking, raining,
   or ejecting outward where mist/humid spray should run.
-- shake: a crash, collision, hit, explosion, jumping, bouncing, strong shaking,
-  screen shake, or anything that should create a vibration feeling.
-- speed: anything moving with a clear sense of speed, rushing wind, fast travel,
-  driving, sprinting, chasing, acceleration, or fast camera motion.
+- speed: walking, running, jumping, driving, riding, flying, chasing, fast travel,
+  acceleration, fast camera motion, or anything with motion or a sense of speed
+  where airflow should run.
+- shake: a crash, collision, hit, explosion, strong shaking, screen shake, or
+  anything that should create a vibration feeling. Do not choose shake for normal
+  walking, jumping, running, or driving unless there is an impact or violent shake.
 - none: no hardware effect is appropriate.
 
 Hardware mapping:
 - spray -> mist
-- shake -> vibration
 - speed -> fan
+- shake -> vibration
 - none -> no effect
 
 Return only JSON with this shape:
