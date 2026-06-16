@@ -63,6 +63,37 @@ uv run python main.py preprocess/output/demo.timeline.json --dry-run --status-wi
 
 The status window clock updates continuously from the same timeline clock used to trigger effects.
 
+## Manual Module Control
+
+Run the standalone manual control CLI to switch modules on and off in real time:
+
+```bash
+uv run python manual_control.py
+```
+
+Inside the prompt, use one command per line:
+
+```text
+fan on
+fan off
+mist on
+mist off
+vibration on
+vibration off
+led 255 120 0 0.6
+led off
+all off
+status
+help
+quit
+```
+
+You can also override GPIO pins when starting manual control:
+
+```bash
+uv run python manual_control.py --fan-ina-pin 22 --fan-inb-pin 27 --vibration-pin 17 --mist-pin 23
+```
+
 Play the demo video and trigger effects on the same clock:
 
 ```bash
