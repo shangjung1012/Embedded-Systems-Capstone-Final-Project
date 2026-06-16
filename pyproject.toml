@@ -10,6 +10,8 @@ dependencies = [
     "imageio-ffmpeg>=0.6.0",
     "opencv-python-headless>=4.10.0.84",
     "pygame-ce>=2.5.7",
+    "rpi-gpio>=0.7.1",
+    "rpi-ws281x>=5.0.0",
 ]
 
 [project.scripts]

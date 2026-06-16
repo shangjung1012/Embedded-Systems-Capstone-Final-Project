@@ -9,6 +9,7 @@ class MistController:
     def __init__(self) -> None:
         # active_high=False: .on() → GPIO LOW (霧化開), .off() → GPIO HIGH (霧化關)
         self.mist = create_output_device(GpioPins.MIST, active_high=False)
+        self.mist.off()
 
     def apply(self, config: dict[str, object]) -> None:
         enabled = bool(config.get("enabled", False))
@@ -31,4 +32,3 @@ class MistController:
         self.mist.on()      # GPIO LOW
         time.sleep(0.1)
         self.mist.off()     # GPIO HIGH → 關閉
-
