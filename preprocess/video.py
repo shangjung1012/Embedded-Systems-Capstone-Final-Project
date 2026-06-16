@@ -106,8 +106,7 @@ def _sample_positions(length: int, count: int, *, reverse: bool) -> list[int]:
 
 def _pixel_config(pixel: Any) -> dict[str, Any]:
     blue, green, red = (int(value) for value in pixel[:3])
-    brightness = max(0.08, min(1.0, max(red, green, blue) / 255))
-    return {"rgb": [red, green, blue], "brightness": round(brightness, 2)}
+    return {"rgb": [red, green, blue], "brightness": 1.0}
 
 
 def _frame_led_color(frame: Any, cv2: Any) -> tuple[list[int], float]:
