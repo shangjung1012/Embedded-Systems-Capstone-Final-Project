@@ -91,6 +91,13 @@ Run the timeline clock and module logs without opening the video player:
 uv run python main.py preprocess/output/demo.timeline.json --dry-run
 ```
 
+Run only selected modules while keeping video playback synchronized:
+
+```bash
+sudo uv run python main.py preprocess/output/demo.timeline.json --modules led --video preprocess/video/demo.mp4
+sudo uv run python main.py preprocess/output/demo.timeline.json --modules fan,mist --video preprocess/video/demo.mp4
+```
+
 Open a realtime status window while running:
 
 ```bash

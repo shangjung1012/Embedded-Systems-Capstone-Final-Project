@@ -60,9 +60,22 @@ class EffectController:
         self.apply(DEFAULT_EFFECTS, force=True)
 
 
-def merge_active_effects(events: list[dict[str, Any]]) -> dict[str, Any]:
+def filter_effects(effects: dict[str, Any], enabled_modules: set[str] | None) -> dict[str, Any]:
+    if not enabled_modules:
+        return effects
+    return {
+        module: effects.get(module, DEFAULT_EFFECTS[module]) if module in enabled_modules else DEFAULT_EFFECTS[module]
+        for module in DEFAULT_EFFECTS
+    }
+
+
+def _merge_active_effects(
+    events: list[dict[str, Any]],
+    *,
+    enabled_modules: set[str] | None = None,
+) -> dict[str, Any]:
     if not events:
-        return DEFAULT_EFFECTS
+        return filter_effects(DEFAULT_EFFECTS, enabled_modules)
 
     merged = {
         "fan": {"enabled": False},
@@ -87,4 +100,12 @@ def merge_active_effects(events: list[dict[str, Any]]) -> dict[str, Any]:
 
     if newest_led_event is not None:
         merged["led"] = dict(newest_led_event["effects"].get("led", DEFAULT_EFFECTS["led"]))
-    return merged
+    return filter_effects(merged, enabled_modules)
+
+
+def merge_active_effects(
+    events: list[dict[str, Any]],
+    *,
+    enabled_modules: set[str] | None = None,
+) -> dict[str, Any]:
+    return _merge_active_effects(events, enabled_modules=enabled_modules)

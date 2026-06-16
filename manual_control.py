@@ -35,7 +35,7 @@ def main() -> int:
     if os.geteuid() != 0:
         print(
             "manual_control.py must be run as root for GPIO/LED hardware. "
-            "Use: sudo /home/pi/.local/bin/uv run python manual_control.py",
+            "Use: sudo uv run python manual_control.py",
             file=sys.stderr,
         )
         return 1
