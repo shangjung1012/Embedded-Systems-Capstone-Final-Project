@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import argparse
+import os
+import sys
 
 from app.gpio import configure_gpio_pins
 from app.manual_control import ManualControlSession
@@ -29,6 +31,14 @@ def main() -> int:
         help="BCM GPIO pin for the mist module. Defaults to MIST_PIN or 23.",
     )
     args = parser.parse_args()
+
+    if os.geteuid() != 0:
+        print(
+            "manual_control.py must be run as root for GPIO/LED hardware. "
+            "Use: sudo /home/pi/.local/bin/uv run python manual_control.py",
+            file=sys.stderr,
+        )
+        return 1
 
     configure_gpio_pins(
         vibration_pin=args.vibration_pin,

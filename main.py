@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import argparse
+import os
 from pathlib import Path
+import sys
 
 from app.gpio import configure_gpio_pins
 from app.runtime import TimelineRuntime
@@ -74,6 +76,14 @@ def main() -> int:
         help="BCM GPIO pin for the mist module. Defaults to MIST_PIN or 23.",
     )
     args = parser.parse_args()
+
+    if not args.preview and os.geteuid() != 0:
+        print(
+            "main.py must be run as root for GPIO/LED hardware. "
+            "Use: sudo /home/pi/.local/bin/uv run python main.py preprocess/output/demo.timeline.json",
+            file=sys.stderr,
+        )
+        return 1
 
     configure_gpio_pins(
         vibration_pin=args.vibration_pin,

@@ -27,7 +27,7 @@ class TimelineRuntime:
         self.video_path = video_path
         self.player_name = "none" if dry_run else player
         self.speed = speed
-        self.effects = EffectController.create()
+        self.effects: EffectController | None = None
         self.status_monitor = build_status_monitor(window=status_window)
 
     def preview(self) -> None:
@@ -37,6 +37,7 @@ class TimelineRuntime:
     def run(self) -> None:
         events = self._load_events()
         player = VideoPlayer(self.video_path, self.player_name)
+        self.effects = EffectController.create()
         active_events: list[dict[str, Any]] = []
         change_points = _build_change_points(events)
 
