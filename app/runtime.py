@@ -194,6 +194,8 @@ def _config_from_schedule_item(module: str, item: dict[str, Any]) -> dict[str, A
     if module == "vibration":
         return {"enabled": item["enabled"]}
     if module == "led":
+        if "zones" in item:
+            return {"zones": item["zones"]}
         return {"rgb": item["rgb"], "brightness": item["brightness"]}
     return {}
 
@@ -203,6 +205,14 @@ def _format_event(event: dict[str, Any]) -> str:
         module = event["module"]
         effect_key = "led" if module == "led" else module
         config = event["effects"].get(effect_key, {})
+        if module == "led" and isinstance(config, dict) and isinstance(config.get("zones"), dict):
+            zones = config["zones"]
+            config = {
+                "zones": {
+                    name: len(values) if isinstance(values, list) else "solid"
+                    for name, values in zones.items()
+                }
+            }
         return (
             f"{event['start']} -> {event['end']} "
             f"module={module} "
