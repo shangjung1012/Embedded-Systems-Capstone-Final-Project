@@ -12,6 +12,7 @@ dependencies = [
     "pygame-ce>=2.5.7",
     "rpi-gpio>=0.7.1",
     "rpi-ws281x>=5.0.0",
+    "pytest>=9.1.1",
 ]
 
 [project.scripts]
