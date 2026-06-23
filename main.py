@@ -11,6 +11,8 @@ from app.runtime import TimelineRuntime
 
 DEFAULT_TIMELINE = Path("preprocess/output/demo.timeline.json")
 DEFAULT_VIDEO = Path("preprocess/video/demo.mp4")
+TIMELINE_DIR = Path("preprocess/output")
+VIDEO_DIR = Path("preprocess/video")
 
 
 def main() -> int:
@@ -20,7 +22,11 @@ def main() -> int:
         nargs="?",
         type=Path,
         default=DEFAULT_TIMELINE,
-        help=f"Timeline JSON path. Defaults to {DEFAULT_TIMELINE}.",
+        help=(
+            "Timeline JSON path or media name. Example: 'demo2' resolves to "
+            "preprocess/output/demo2.timeline.json and preprocess/video/demo2.mp4. "
+            f"Defaults to {DEFAULT_TIMELINE}."
+        ),
     )
     parser.add_argument(
         "--video",
@@ -86,6 +92,7 @@ def main() -> int:
     )
     args = parser.parse_args()
     enabled_modules = _parse_modules(args.modules)
+    timeline_path, video_path = _resolve_media_paths(args.timeline, args.video)
 
     if not args.preview and os.geteuid() != 0:
         print(
@@ -103,8 +110,8 @@ def main() -> int:
     )
 
     runtime = TimelineRuntime(
-        args.timeline,
-        video_path=args.video,
+        timeline_path,
+        video_path=video_path,
         player=args.player,
         speed=args.speed,
         dry_run=args.dry_run,
@@ -116,6 +123,17 @@ def main() -> int:
     else:
         runtime.run()
     return 0
+
+
+def _resolve_media_paths(timeline: Path, video: Path) -> tuple[Path, Path]:
+    if _is_short_media_name(timeline):
+        name = timeline.name
+        return TIMELINE_DIR / f"{name}.timeline.json", VIDEO_DIR / f"{name}.mp4"
+    return timeline, video
+
+
+def _is_short_media_name(value: Path) -> bool:
+    return len(value.parts) == 1 and value.suffix == ""
 
 def _parse_modules(values: list[str] | None) -> set[str] | None:
     if not values:
