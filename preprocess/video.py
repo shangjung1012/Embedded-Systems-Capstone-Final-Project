@@ -12,7 +12,8 @@ ZONE_LED_COUNTS = {
     "top": 22,
     "left": 17,
 }
-_EDGE_SAMPLE_SIZE = (40, 32)
+_EDGE_SAMPLE_SIZE = (96, 54)
+_EDGE_SAMPLE_DEPTH_RATIO = 0.08
 
 
 def build_video_color_events(
@@ -75,33 +76,56 @@ def build_video_color_events(
 def _frame_led_zones(frame: Any, cv2: Any) -> dict[str, list[dict[str, Any]]]:
     resized = cv2.resize(frame, _EDGE_SAMPLE_SIZE, interpolation=cv2.INTER_AREA)
     height, width = resized.shape[:2]
+    depth = max(2, round(min(height, width) * _EDGE_SAMPLE_DEPTH_RATIO))
     return {
-        "right": _sample_vertical_edge(resized, column=width - 1, count=ZONE_LED_COUNTS["right"], reverse=True),
-        "top": _sample_horizontal_edge(resized, row=0, count=ZONE_LED_COUNTS["top"], reverse=True),
-        "left": _sample_vertical_edge(resized, column=0, count=ZONE_LED_COUNTS["left"], reverse=False),
+        "right": _sample_vertical_edge(resized, column_start=width - depth, column_end=width, count=ZONE_LED_COUNTS["right"], reverse=True),
+        "top": _sample_horizontal_edge(resized, row_start=0, row_end=depth, count=ZONE_LED_COUNTS["top"], reverse=True),
+        "left": _sample_vertical_edge(resized, column_start=0, column_end=depth, count=ZONE_LED_COUNTS["left"], reverse=False),
     }
 
 
-def _sample_vertical_edge(frame: Any, *, column: int, count: int, reverse: bool) -> list[dict[str, Any]]:
+def _sample_vertical_edge(
+    frame: Any,
+    *,
+    column_start: int,
+    column_end: int,
+    count: int,
+    reverse: bool,
+) -> list[dict[str, Any]]:
     height = frame.shape[0]
-    positions = _sample_positions(height, count, reverse=reverse)
-    return [_pixel_config(frame[position, column]) for position in positions]
+    segments = _sample_segments(height, count, reverse=reverse)
+    return [_region_config(frame[start:end, column_start:column_end]) for start, end in segments]
 
 
-def _sample_horizontal_edge(frame: Any, *, row: int, count: int, reverse: bool) -> list[dict[str, Any]]:
+def _sample_horizontal_edge(
+    frame: Any,
+    *,
+    row_start: int,
+    row_end: int,
+    count: int,
+    reverse: bool,
+) -> list[dict[str, Any]]:
     width = frame.shape[1]
-    positions = _sample_positions(width, count, reverse=reverse)
-    return [_pixel_config(frame[row, position]) for position in positions]
+    segments = _sample_segments(width, count, reverse=reverse)
+    return [_region_config(frame[row_start:row_end, start:end]) for start, end in segments]
 
 
-def _sample_positions(length: int, count: int, *, reverse: bool) -> list[int]:
-    if count <= 1:
-        positions = [0]
-    else:
-        positions = [round(index * (length - 1) / (count - 1)) for index in range(count)]
+def _sample_segments(length: int, count: int, *, reverse: bool) -> list[tuple[int, int]]:
+    if count <= 0:
+        return []
+    segments = []
+    for index in range(count):
+        start = round(index * length / count)
+        end = round((index + 1) * length / count)
+        segments.append((start, max(start + 1, end)))
     if reverse:
-        positions.reverse()
-    return positions
+        segments.reverse()
+    return segments
+
+
+def _region_config(region: Any) -> dict[str, Any]:
+    mean_bgr = region.mean(axis=(0, 1))
+    return _pixel_config(mean_bgr)
 
 
 def _pixel_config(pixel: Any) -> dict[str, Any]:
@@ -111,12 +135,7 @@ def _pixel_config(pixel: Any) -> dict[str, Any]:
 
 def _enhance_rgb(rgb: list[int]) -> list[int]:
     mean = sum(rgb) / 3
-    boosted = [_clamp(round(mean + (channel - mean) * 2.2), 0, 255) for channel in rgb]
-    max_channel = max(boosted)
-    if max_channel > 0:
-        scale = 255 / max_channel
-        boosted = [_clamp(round(channel * scale), 0, 255) for channel in boosted]
-    return boosted
+    return [_clamp(round(mean + (channel - mean) * 1.25), 0, 255) for channel in rgb]
 
 
 def _frame_led_color(frame: Any, cv2: Any) -> tuple[list[int], float]:
