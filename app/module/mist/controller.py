@@ -40,3 +40,6 @@ class MistController:
         if self.available:
             GPIO.output(self.pin, GPIO.HIGH)
             time.sleep(0.1)
+            GPIO.output(self.pin, GPIO.LOW)
+            time.sleep(0.1)
+            GPIO.output(self.pin, GPIO.HIGH)
