@@ -20,6 +20,7 @@ class TimelineRuntime:
         speed: float = 1.0,
         dry_run: bool = False,
         status_window: bool = False,
+        enabled_modules: set[str] | None = None,
     ) -> None:
         if speed <= 0:
             raise ValueError("speed must be greater than 0")
@@ -27,16 +28,18 @@ class TimelineRuntime:
         self.video_path = video_path
         self.player_name = "none" if dry_run else player
         self.speed = speed
-        self.effects = EffectController.create()
+        self.effects: EffectController | None = None
         self.status_monitor = build_status_monitor(window=status_window)
+        self.enabled_modules = enabled_modules
 
     def preview(self) -> None:
-        for event in self._load_events():
+        for event in self._filtered_events(self._load_events()):
             print(_format_event(event))
 
     def run(self) -> None:
-        events = self._load_events()
+        events = self._filtered_events(self._load_events())
         player = VideoPlayer(self.video_path, self.player_name)
+        self.effects = EffectController.create()
         active_events: list[dict[str, Any]] = []
         change_points = _build_change_points(events)
 
@@ -59,7 +62,7 @@ class TimelineRuntime:
                     active_events = [active_event for active_event in active_events if active_event is not event]
                     print(f"[timeline] end {_event_label(event)}")
 
-                current_effects = merge_active_effects(active_events)
+                current_effects = merge_active_effects(active_events, enabled_modules=self.enabled_modules)
                 self.effects.apply(current_effects)
                 self.status_monitor.update(event_time_ms, current_effects)
 
@@ -87,6 +90,15 @@ class TimelineRuntime:
         else:
             events = timeline.get("events", [])
         return sorted(events, key=lambda event: (event["start_ms"], event["end_ms"], event.get("id", "")))
+
+    def _filtered_events(self, events: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        if not self.enabled_modules:
+            return events
+        return [
+            event
+            for event in events
+            if any(module in self.enabled_modules for module in event.get("effects", {}))
+        ]
 
 
 def _build_change_points(events: list[dict[str, Any]]) -> list[tuple[int, str, dict[str, Any]]]:
@@ -193,6 +205,8 @@ def _config_from_schedule_item(module: str, item: dict[str, Any]) -> dict[str, A
     if module == "vibration":
         return {"enabled": item["enabled"]}
     if module == "led":
+        if "zones" in item:
+            return {"zones": item["zones"]}
         return {"rgb": item["rgb"], "brightness": item["brightness"]}
     return {}
 
@@ -202,6 +216,14 @@ def _format_event(event: dict[str, Any]) -> str:
         module = event["module"]
         effect_key = "led" if module == "led" else module
         config = event["effects"].get(effect_key, {})
+        if module == "led" and isinstance(config, dict) and isinstance(config.get("zones"), dict):
+            zones = config["zones"]
+            config = {
+                "zones": {
+                    name: len(values) if isinstance(values, list) else "solid"
+                    for name, values in zones.items()
+                }
+            }
         return (
             f"{event['start']} -> {event['end']} "
             f"module={module} "

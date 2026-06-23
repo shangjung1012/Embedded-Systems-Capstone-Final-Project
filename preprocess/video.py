@@ -7,6 +7,14 @@ from preprocess.rules import NEUTRAL_EFFECTS
 from preprocess.srt import format_timecode
 
 
+ZONE_LED_COUNTS = {
+    "right": 14,
+    "top": 22,
+    "left": 17,
+}
+_EDGE_SAMPLE_SIZE = (40, 32)
+
+
 def build_video_color_events(
     video_path: Path,
     *,
@@ -29,10 +37,9 @@ def build_video_color_events(
     frame_count = int(capture.get(cv2.CAP_PROP_FRAME_COUNT) or 0)
     duration_ms = int(frame_count / fps * 1000) if frame_count > 0 else 0
     events: list[dict[str, Any]] = []
-    previous_rgb: list[int] | None = None
+    previous_signature: list[int] | None = None
     event_start_ms = 0
-    event_rgb = [0, 0, 0]
-    event_brightness = 0.0
+    event_zones: dict[str, list[dict[str, Any]]] | None = None
 
     for current_ms in range(0, max(duration_ms, interval_ms), interval_ms):
         capture.set(cv2.CAP_PROP_POS_MSEC, current_ms)
@@ -40,30 +47,76 @@ def build_video_color_events(
         if not ok:
             break
 
-        rgb, brightness = _frame_led_color(frame, cv2)
-        if previous_rgb is None:
-            previous_rgb = rgb
-            event_rgb = rgb
-            event_brightness = brightness
+        zones = _frame_led_zones(frame, cv2)
+        signature = _zones_signature(zones)
+        if previous_signature is None:
+            previous_signature = signature
+            event_zones = zones
             event_start_ms = current_ms
             continue
 
-        if _color_distance(previous_rgb, rgb) < color_change_threshold:
+        if _color_distance(previous_signature, signature) < color_change_threshold:
             continue
 
-        events.append(_build_led_event(len(events) + 1, event_start_ms, current_ms, event_rgb, event_brightness))
-        previous_rgb = rgb
-        event_rgb = rgb
-        event_brightness = brightness
+        events.append(_build_led_event(len(events) + 1, event_start_ms, current_ms, event_zones))
+        previous_signature = signature
+        event_zones = zones
         event_start_ms = current_ms
 
     capture.release()
 
-    if previous_rgb is not None:
+    if previous_signature is not None and event_zones is not None:
         event_end_ms = duration_ms if duration_ms > event_start_ms else event_start_ms + interval_ms
-        events.append(_build_led_event(len(events) + 1, event_start_ms, event_end_ms, event_rgb, event_brightness))
+        events.append(_build_led_event(len(events) + 1, event_start_ms, event_end_ms, event_zones))
 
     return events
+
+
+def _frame_led_zones(frame: Any, cv2: Any) -> dict[str, list[dict[str, Any]]]:
+    resized = cv2.resize(frame, _EDGE_SAMPLE_SIZE, interpolation=cv2.INTER_AREA)
+    height, width = resized.shape[:2]
+    return {
+        "right": _sample_vertical_edge(resized, column=width - 1, count=ZONE_LED_COUNTS["right"], reverse=True),
+        "top": _sample_horizontal_edge(resized, row=0, count=ZONE_LED_COUNTS["top"], reverse=True),
+        "left": _sample_vertical_edge(resized, column=0, count=ZONE_LED_COUNTS["left"], reverse=False),
+    }
+
+
+def _sample_vertical_edge(frame: Any, *, column: int, count: int, reverse: bool) -> list[dict[str, Any]]:
+    height = frame.shape[0]
+    positions = _sample_positions(height, count, reverse=reverse)
+    return [_pixel_config(frame[position, column]) for position in positions]
+
+
+def _sample_horizontal_edge(frame: Any, *, row: int, count: int, reverse: bool) -> list[dict[str, Any]]:
+    width = frame.shape[1]
+    positions = _sample_positions(width, count, reverse=reverse)
+    return [_pixel_config(frame[row, position]) for position in positions]
+
+
+def _sample_positions(length: int, count: int, *, reverse: bool) -> list[int]:
+    if count <= 1:
+        positions = [0]
+    else:
+        positions = [round(index * (length - 1) / (count - 1)) for index in range(count)]
+    if reverse:
+        positions.reverse()
+    return positions
+
+
+def _pixel_config(pixel: Any) -> dict[str, Any]:
+    blue, green, red = (int(value) for value in pixel[:3])
+    return {"rgb": _enhance_rgb([red, green, blue]), "brightness": 1.0}
+
+
+def _enhance_rgb(rgb: list[int]) -> list[int]:
+    mean = sum(rgb) / 3
+    boosted = [_clamp(round(mean + (channel - mean) * 2.2), 0, 255) for channel in rgb]
+    max_channel = max(boosted)
+    if max_channel > 0:
+        scale = 255 / max_channel
+        boosted = [_clamp(round(channel * scale), 0, 255) for channel in boosted]
+    return boosted
 
 
 def _frame_led_color(frame: Any, cv2: Any) -> tuple[list[int], float]:
@@ -83,12 +136,11 @@ def _build_led_event(
     index: int,
     start_ms: int,
     end_ms: int,
-    rgb: list[int],
-    brightness: float,
+    zones: dict[str, list[dict[str, Any]]],
 ) -> dict[str, Any]:
     effects = {
         **NEUTRAL_EFFECTS,
-        "led": {"rgb": rgb, "brightness": brightness},
+        "led": {"zones": zones},
     }
     return {
         "id": f"video-color-{index:04d}",
@@ -107,3 +159,16 @@ def _build_led_event(
 def _color_distance(left: list[int], right: list[int]) -> int:
     return max(abs(left[index] - right[index]) for index in range(3))
 
+
+def _clamp(value: int, minimum: int, maximum: int) -> int:
+    return max(minimum, min(maximum, value))
+
+
+def _zones_signature(zones: dict[str, list[dict[str, Any]]]) -> list[int]:
+    pixels = [pixel for zone in zones.values() for pixel in zone]
+    if not pixels:
+        return [0, 0, 0]
+    return [
+        round(sum(pixel["rgb"][channel] for pixel in pixels) / len(pixels))
+        for channel in range(3)
+    ]

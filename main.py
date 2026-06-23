@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import argparse
+import os
 from pathlib import Path
+import sys
 
 from app.gpio import configure_gpio_pins
 from app.runtime import TimelineRuntime
@@ -54,6 +56,15 @@ def main() -> int:
         help="Open a small realtime window showing current module states.",
     )
     parser.add_argument(
+        "--modules",
+        action="append",
+        choices=None,
+        help=(
+            "Only run selected hardware modules while video plays. "
+            "Use comma-separated names or repeat the option. Choices: fan,mist,vibration,led."
+        ),
+    )
+    parser.add_argument(
         "--vibration-pin",
         type=int,
         help="BCM GPIO pin for the vibration module. Defaults to VIBRATION_PIN or 17.",
@@ -74,6 +85,15 @@ def main() -> int:
         help="BCM GPIO pin for the mist module. Defaults to MIST_PIN or 23.",
     )
     args = parser.parse_args()
+    enabled_modules = _parse_modules(args.modules)
+
+    if not args.preview and os.geteuid() != 0:
+        print(
+            "main.py must be run as root for GPIO/LED hardware. "
+            "Use: sudo uv run python main.py preprocess/output/demo.timeline.json",
+            file=sys.stderr,
+        )
+        return 1
 
     configure_gpio_pins(
         vibration_pin=args.vibration_pin,
@@ -89,12 +109,29 @@ def main() -> int:
         speed=args.speed,
         dry_run=args.dry_run,
         status_window=args.status_window,
+        enabled_modules=enabled_modules,
     )
     if args.preview:
         runtime.preview()
     else:
         runtime.run()
     return 0
+
+def _parse_modules(values: list[str] | None) -> set[str] | None:
+    if not values:
+        return None
+
+    modules = {
+        module.strip().lower()
+        for value in values
+        for module in value.split(",")
+        if module.strip()
+    }
+    valid_modules = {"fan", "mist", "vibration", "led"}
+    invalid_modules = sorted(modules - valid_modules)
+    if invalid_modules:
+        raise SystemExit(f"Unknown module(s): {', '.join(invalid_modules)}")
+    return modules
 
 
 if __name__ == "__main__":

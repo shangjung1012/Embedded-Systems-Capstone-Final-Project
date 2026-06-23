@@ -3,13 +3,14 @@ from __future__ import annotations
 import argparse
 import os
 import sys
+import time
 
+from app.effects import EffectController
 from app.gpio import configure_gpio_pins
-from app.manual_control import ManualControlSession
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Interactively turn hardware modules on and off.")
+    parser = argparse.ArgumentParser(description="Reset all hardware modules to the off state.")
     parser.add_argument(
         "--vibration-pin",
         type=int,
@@ -30,14 +31,33 @@ def main() -> int:
         type=int,
         help="BCM GPIO pin for the mist module. Defaults to MIST_PIN or 23.",
     )
+    parser.add_argument(
+        "--repeat",
+        type=int,
+        default=2,
+        help="How many times to send the all-off reset command. Defaults to 2.",
+    )
+    parser.add_argument(
+        "--delay",
+        type=float,
+        default=0.2,
+        help="Delay in seconds between repeated reset commands. Defaults to 0.2.",
+    )
     args = parser.parse_args()
 
     if os.geteuid() != 0:
         print(
-            "manual_control.py must be run as root for GPIO/LED hardware. "
-            "Use: sudo uv run python manual_control.py",
+            "reset_modules.py must be run as root for GPIO/LED hardware. "
+            "Use: sudo uv run python reset_modules.py",
             file=sys.stderr,
         )
+        return 1
+
+    if args.repeat < 1:
+        print("--repeat must be at least 1", file=sys.stderr)
+        return 1
+    if args.delay < 0:
+        print("--delay must be 0 or greater", file=sys.stderr)
         return 1
 
     configure_gpio_pins(
@@ -47,7 +67,13 @@ def main() -> int:
         mist_pin=args.mist_pin,
     )
 
-    ManualControlSession().run()
+    controller = EffectController.create()
+    for index in range(args.repeat):
+        controller.off()
+        if index < args.repeat - 1:
+            time.sleep(args.delay)
+
+    print("All modules reset to off.")
     return 0
 
 

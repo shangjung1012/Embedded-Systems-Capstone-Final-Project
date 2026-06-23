@@ -27,6 +27,8 @@ class ManualCommandResult:
     message: str
     should_apply: bool = False
     should_exit: bool = False
+    force: bool = False
+    force_modules: set[str] | None = None
     error: str | None = None
 
 
@@ -48,6 +50,7 @@ def apply_manual_command(current_effects: dict[str, object], command_line: str) 
             message="Exiting manual control.",
             should_apply=True,
             should_exit=True,
+            force=True,
         )
 
     if command == "help":
@@ -62,6 +65,7 @@ def apply_manual_command(current_effects: dict[str, object], command_line: str) 
                 effects=initial_effects(),
                 message=format_effects_status(DEFAULT_EFFECTS),
                 should_apply=True,
+                force=True,
             )
         return _error(effects, "Use: all off")
 
@@ -126,7 +130,11 @@ class ManualControlSession:
 
                 self.effects = result.effects
                 if result.should_apply:
-                    self.controller.apply(self.effects, force=True)
+                    self.controller.apply(
+                        self.effects,
+                        force=result.force,
+                        force_modules=result.force_modules,
+                    )
                 if result.message:
                     self._print(result.message)
                 if result.should_exit:
@@ -151,13 +159,19 @@ def _apply_on_off(effects: dict[str, object], module: str, parts: list[str]) -> 
         effects=effects,
         message=format_effects_status(effects),
         should_apply=True,
+        force_modules={module},
     )
 
 
 def _apply_led(effects: dict[str, object], parts: list[str]) -> ManualCommandResult:
     if parts == ["led", "off"]:
         effects["led"] = {"rgb": [0, 0, 0], "brightness": 0.0}
-        return ManualCommandResult(effects=effects, message=format_effects_status(effects), should_apply=True)
+        return ManualCommandResult(
+            effects=effects,
+            message=format_effects_status(effects),
+            should_apply=True,
+            force_modules={"led"},
+        )
 
     if len(parts) != 5:
         return _error(effects, "Use: led R G B BRIGHTNESS or led off")
@@ -174,7 +188,12 @@ def _apply_led(effects: dict[str, object], parts: list[str]) -> ManualCommandRes
         return _error(effects, "LED brightness must be between 0.0 and 1.0")
 
     effects["led"] = {"rgb": [red, green, blue], "brightness": brightness}
-    return ManualCommandResult(effects=effects, message=format_effects_status(effects), should_apply=True)
+    return ManualCommandResult(
+        effects=effects,
+        message=format_effects_status(effects),
+        should_apply=True,
+        force_modules={"led"},
+    )
 
 
 def _error(effects: dict[str, object], message: str) -> ManualCommandResult:

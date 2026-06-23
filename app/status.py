@@ -103,14 +103,36 @@ def build_status_monitor(*, window: bool) -> StatusMonitor:
 
 def normalize_effects(effects: dict[str, Any]) -> dict[str, Any]:
     led = effects.get("led", DEFAULT_EFFECTS["led"])
+    normalized_led = _normalize_led(led)
     return {
         "fan": {"enabled": bool(effects.get("fan", DEFAULT_EFFECTS["fan"])["enabled"])},
         "mist": {"enabled": bool(effects.get("mist", DEFAULT_EFFECTS["mist"])["enabled"])},
         "vibration": {"enabled": bool(effects.get("vibration", DEFAULT_EFFECTS["vibration"])["enabled"])},
-        "led": {
-            "rgb": [int(value) for value in led["rgb"]],
-            "brightness": float(led["brightness"]),
-        },
+        "led": normalized_led,
+    }
+
+
+def _normalize_led(led: dict[str, Any]) -> dict[str, Any]:
+    zones = led.get("zones")
+    if isinstance(zones, dict):
+        pixels = [
+            pixel
+            for zone in zones.values()
+            if isinstance(zone, list)
+            for pixel in zone
+            if isinstance(pixel, dict) and "rgb" in pixel
+        ]
+        if pixels:
+            rgb = [
+                round(sum(int(pixel["rgb"][channel]) for pixel in pixels) / len(pixels))
+                for channel in range(3)
+            ]
+            brightness = sum(float(pixel.get("brightness", 1.0)) for pixel in pixels) / len(pixels)
+            return {"rgb": rgb, "brightness": brightness}
+
+    return {
+        "rgb": [int(value) for value in led["rgb"]],
+        "brightness": float(led["brightness"]),
     }
 
 

@@ -35,24 +35,31 @@ class EffectController:
             vibrator=VibratorController(),
         )
 
-    def apply(self, effects: dict[str, Any], *, force: bool = False) -> None:
+    def apply(
+        self,
+        effects: dict[str, Any],
+        *,
+        force: bool = False,
+        force_modules: set[str] | None = None,
+    ) -> None:
+        force_modules = force_modules or set()
         normalized = {
             "fan": effects.get("fan", DEFAULT_EFFECTS["fan"]),
             "mist": effects.get("mist", DEFAULT_EFFECTS["mist"]),
             "vibration": effects.get("vibration", DEFAULT_EFFECTS["vibration"]),
             "led": effects.get("led", DEFAULT_EFFECTS["led"]),
         }
-        if not force and normalized == self.last_effects:
+        if not force and not force_modules and normalized == self.last_effects:
             return
 
         previous = self.last_effects or {}
-        if force or normalized["fan"] != previous.get("fan"):
+        if force or "fan" in force_modules or normalized["fan"] != previous.get("fan"):
             self.fan.apply(normalized["fan"])
-        if force or normalized["mist"] != previous.get("mist"):
+        if force or "mist" in force_modules or normalized["mist"] != previous.get("mist"):
             self.mist.apply(normalized["mist"])
-        if force or normalized["vibration"] != previous.get("vibration"):
+        if force or "vibration" in force_modules or normalized["vibration"] != previous.get("vibration"):
             self.vibrator.apply(normalized["vibration"])
-        if force or normalized["led"] != previous.get("led"):
+        if force or "led" in force_modules or normalized["led"] != previous.get("led"):
             self.light.apply(normalized["led"])
         self.last_effects = deepcopy(normalized)
 
@@ -60,9 +67,22 @@ class EffectController:
         self.apply(DEFAULT_EFFECTS, force=True)
 
 
-def merge_active_effects(events: list[dict[str, Any]]) -> dict[str, Any]:
+def filter_effects(effects: dict[str, Any], enabled_modules: set[str] | None) -> dict[str, Any]:
+    if not enabled_modules:
+        return effects
+    return {
+        module: effects.get(module, DEFAULT_EFFECTS[module]) if module in enabled_modules else DEFAULT_EFFECTS[module]
+        for module in DEFAULT_EFFECTS
+    }
+
+
+def _merge_active_effects(
+    events: list[dict[str, Any]],
+    *,
+    enabled_modules: set[str] | None = None,
+) -> dict[str, Any]:
     if not events:
-        return DEFAULT_EFFECTS
+        return filter_effects(DEFAULT_EFFECTS, enabled_modules)
 
     merged = {
         "fan": {"enabled": False},
@@ -87,4 +107,12 @@ def merge_active_effects(events: list[dict[str, Any]]) -> dict[str, Any]:
 
     if newest_led_event is not None:
         merged["led"] = dict(newest_led_event["effects"].get("led", DEFAULT_EFFECTS["led"]))
-    return merged
+    return filter_effects(merged, enabled_modules)
+
+
+def merge_active_effects(
+    events: list[dict[str, Any]],
+    *,
+    enabled_modules: set[str] | None = None,
+) -> dict[str, Any]:
+    return _merge_active_effects(events, enabled_modules=enabled_modules)
